@@ -1,0 +1,18 @@
+<section class="selection_screen">
+    <article ng-init="product" class="prfl_box">
+        <h3>{{ product.name }}</h3>
+        <p>{{ product.description }}</p>
+        <span>Price <em>{{ product.price }}</em> USD</span>
+        <article ng-repeat="x in product.comments" class="prfl_box">
+            <span style="align:left">{{ x.comment }}</span>
+            <em style="align:right">{{ x.time }}</em>
+        </article>        
+		<form>
+		    <article class="new_posts">
+		        <h2>Comment</h2>
+		        <input type="text" ng-model="comment" />
+		        <a ng-click="saveComment()" class="button text_center ui-link">Save</a>
+		    </article>
+		</form>        
+    </article>
+</section>

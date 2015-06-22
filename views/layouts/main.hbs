@@ -1,0 +1,115 @@
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="stylesheets/style.css">
+		<link rel="shortcut icon" href="images/favicon.ico">
+		<title>Angular Test App</title>
+		<script type="text/javascript" src="javascripts/jquery.js"></script>
+		<script type="text/javascript" src="javascripts/angular.min.js"></script>
+		<script type="text/javascript" src="javascripts/angular-route.min.js"></script>
+
+		<script type="text/javascript">
+		var angApp = angular.module('angularTestApp',['ngRoute'])
+
+		angApp.controller('list',function($scope,$http,$location){
+			$scope.products = []
+			
+			function init(){
+
+				$http({
+				    headers: {'Content-Type': 'application/json'},
+				    url: 'products',
+				    method: "GET"
+				})
+				.success(function(response) {
+					$scope.products = response;
+				});
+			}
+
+			function details(id) {
+				$location.path('/details');
+			}
+			init();
+		})
+
+		angApp.controller('form',function($scope,$http,$location){
+			$scope.form = {}
+
+			$scope.save = function(){
+			    $http({
+			    	headers: {'Content-Type': 'application/json'},
+			        method: 'POST',
+			        url: 'products/addProduct',
+			        data : $scope.form
+			    })
+			    .success(function(data, status) {
+			        $location.path('/list');
+			    })				
+			}
+		})
+
+		angApp.controller('details',function($scope,$http,$routeParams){
+			$scope.product = {}
+			$scope.comment = ''
+			$scope.init = function(){
+			    $scope.comment = ''
+			    $http({
+			    	headers: {'Content-Type': 'application/json'},
+			        method: 'GET',
+			        url: 'products/getProductDetails',
+			        params :{id:$routeParams.id}
+			    })
+			    .success(function(response) {
+			        $scope.product = response.product
+			        $scope.product.comments = response.comments
+			    })				
+			}
+
+			$scope.init();
+
+			$scope.saveComment = function () {
+			    $http({
+			    	headers: {'Content-Type': 'application/json'},
+			        method: 'POST',
+			        url: 'products/addComment',
+			        data : { product_id : $routeParams.id ,comment : $scope.comment }
+			    })
+			    .success(function(data, status) {
+			        $scope.init()
+			    })					
+			}
+		})
+
+		angApp.config(function ($routeProvider) {
+		 
+		    $routeProvider.when("/list", {
+		        controller: "list",
+		        templateUrl: "/views/list.html"
+		    });
+		    $routeProvider.when("/form", {
+		        controller: "form",
+		        templateUrl: "/views/form.html",
+		    });
+		    $routeProvider.when("/details/:id", {
+		        controller: "details",
+		        templateUrl: "/views/details.html",
+		    });		    		    
+		    $routeProvider.otherwise({ redirectTo: "/list" });
+		});	
+		</script>
+	</head>
+	<body ng-app="angularTestApp">
+		<div>
+	        <section>
+	            <header>
+	                <nav class="v2_n">
+	                    <a href="#list" >Products</a>
+	                    <a href="#form" >Add</a>
+	                </nav>
+	            </header>
+	            <section class="main_body max_600width" data-ng-view="">
+	                
+	            </section>
+	        </section>
+		</div>
+	</body>	
+</html>
